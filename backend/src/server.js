@@ -8,10 +8,20 @@ const connectDB = require('./config/db');
 // Load env vars
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
+
+// Database Connection Middleware for Vercel
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            error: 'Failed to connect to database. Please check Vercel Environment Variables and MongoDB IP Access List.'
+        });
+    }
+});
 
 // Security middleware
 app.use(helmet());
