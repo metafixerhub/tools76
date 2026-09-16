@@ -3,7 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const mongoSanitize = require('express-mongo-sanitize');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -16,7 +15,6 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
-app.use(mongoSanitize());
 app.use(cors());
 
 // Body parser

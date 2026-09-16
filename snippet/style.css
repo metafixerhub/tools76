@@ -22,7 +22,7 @@ body {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to fix scrolling */
     color: var(--text-color);
     padding: 2rem;
 }
