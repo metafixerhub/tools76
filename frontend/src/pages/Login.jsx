@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock } from 'lucide-react';
+import PatternLock from '../components/PatternLock';
 
 const Login = () => {
     const { login, isAuthenticated } = useAuth();
-    const [passkey, setPasskey] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
@@ -14,23 +13,27 @@ const Login = () => {
         return <Navigate to="/dashboard" replace />;
     }
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handlePatternSuccess = async () => {
         setError('');
         setIsLoading(true);
 
         try {
-            const success = await login(passkey);
+            // Automatically submit the secure passkey when pattern is correct
+            const success = await login('nur1438nur');
             if (success) {
                 navigate('/');
             } else {
-                setError('Invalid passkey');
+                setError('Authentication failed');
             }
         } catch (err) {
-            setError(err.response?.data?.error || 'Login failed');
+            setError('Login failed');
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handlePatternError = (msg) => {
+        setError(msg);
     };
 
     return (
@@ -42,35 +45,22 @@ const Login = () => {
                 </div>
                 
                 {error && (
-                    <div style={{ background: '#fef2f2', color: 'var(--danger)', padding: '0.75rem', borderRadius: '6px', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+                    <div className="error-alert">
                         {error}
                     </div>
                 )}
                 
-                <form onSubmit={handleSubmit} className="flex-col gap-4">
-                    <div className="form-group">
-                    <label htmlFor="passkey">Dashboard Passkey</label>
-                    <div className="input-with-icon">
-                        <Lock size={18} className="input-icon" />
-                        <input
-                            type="password"
-                            id="passkey"
-                            value={passkey}
-                            onChange={(e) => setPasskey(e.target.value)}
-                            placeholder="Enter unlock key"
-                            required
-                        />
+                {isLoading ? (
+                    <div style={{ textAlign: 'center', padding: '2rem' }}>
+                        <div className="spinner" style={{ margin: '0 auto', borderColor: '#4F46E5', borderTopColor: 'transparent', borderRadius: '50%', width: '40px', height: '40px', borderWidth: '4px', borderStyle: 'solid', animation: 'spin 1s linear infinite' }}></div>
+                        <p style={{ marginTop: '1rem', color: '#4F46E5' }}>Unlocking Dashboard...</p>
                     </div>
-                </div>
-
-                <button 
-                    type="submit" 
-                    className="login-btn"
-                    disabled={isLoading}
-                >
-                    {isLoading ? 'Unlocking...' : 'Unlock Dashboard'}
-                </button>
-                </form>
+                ) : (
+                    <PatternLock 
+                        onSuccess={handlePatternSuccess} 
+                        onError={handlePatternError} 
+                    />
+                )}
             </div>
         </div>
     );
