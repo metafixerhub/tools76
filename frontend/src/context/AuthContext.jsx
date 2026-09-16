@@ -29,11 +29,17 @@ export const AuthProvider = ({ children }) => {
         checkAuth();
     }, []);
 
-    const login = async (email, password) => {
-        const res = await api.post('/auth/login', { email, password });
-        localStorage.setItem('token', res.data.token);
-        setUser(res.data.user);
-        setIsAuthenticated(true);
+    const login = async (passkey) => {
+        try {
+            const res = await api.post('/auth/login', { passkey });
+            const { token, user } = res.data;
+            localStorage.setItem('token', token);
+            setUser(user);
+            setIsAuthenticated(true);
+            return true;
+        } catch (error) {
+            throw error;
+        }
     };
 
     const logout = () => {

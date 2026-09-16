@@ -37,37 +37,32 @@ exports.register = async (req, res) => {
     }
 };
 
-// @desc    Login user
+// @desc    Login user with simple passkey
 // @route   POST /api/auth/login
 // @access  Public
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { passkey } = req.body;
 
-        // Validate email & password
-        if (!email || !password) {
-            return res.status(400).json({ success: false, error: 'Please provide an email and password' });
+        if (!passkey) {
+            return res.status(400).json({ success: false, error: 'Please provide a passkey' });
         }
 
-        // Check for user
-        const user = await User.findOne({ email }).select('+password');
-        if (!user) {
-            return res.status(401).json({ success: false, error: 'Invalid credentials' });
+        // Check if passkey matches the provided key 'nur1438nur'
+        if (passkey !== 'nur1438nur') {
+            return res.status(401).json({ success: false, error: 'Invalid passkey' });
         }
 
-        // Check if password matches (Using plain text for simplicity in this example, use bcrypt in prod)
-        if (user.password !== password) {
-            return res.status(401).json({ success: false, error: 'Invalid credentials' });
-        }
+        // We use a dummy ID since there is no actual user document needed anymore
+        const adminId = 'admin_001';
 
         res.status(200).json({
             success: true,
-            token: generateToken(user._id),
+            token: generateToken(adminId),
             user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role
+                id: adminId,
+                name: 'Admin',
+                role: 'admin'
             }
         });
     } catch (err) {
@@ -80,10 +75,14 @@ exports.login = async (req, res) => {
 // @access  Private
 exports.getMe = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        // Return dummy admin since we are using a single passkey system
         res.status(200).json({
             success: true,
-            data: user
+            data: {
+                id: 'admin_001',
+                name: 'Admin',
+                role: 'admin'
+            }
         });
     } catch (err) {
         res.status(400).json({ success: false, error: err.message });

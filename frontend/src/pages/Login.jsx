@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Lock } from 'lucide-react';
 
 const Login = () => {
     const { login, isAuthenticated } = useAuth();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [passkey, setPasskey] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     if (isAuthenticated) {
         return <Navigate to="/dashboard" replace />;
@@ -16,13 +17,19 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
-        setLoading(true);
+        setIsLoading(true);
+
         try {
-            await login(email, password);
+            const success = await login(passkey);
+            if (success) {
+                navigate('/');
+            } else {
+                setError('Invalid passkey');
+            }
         } catch (err) {
-            setError(err.response?.data?.error || 'Failed to login');
+            setError(err.response?.data?.error || 'Login failed');
         } finally {
-            setLoading(false);
+            setIsLoading(false);
         }
     };
 
@@ -41,29 +48,28 @@ const Login = () => {
                 )}
                 
                 <form onSubmit={handleSubmit} className="flex-col gap-4">
-                    <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Email</label>
-                        <input 
-                            type="email" 
-                            className="input-field" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                    <div className="form-group">
+                    <label htmlFor="passkey">Dashboard Passkey</label>
+                    <div className="input-with-icon">
+                        <Lock size={18} className="input-icon" />
+                        <input
+                            type="password"
+                            id="passkey"
+                            value={passkey}
+                            onChange={(e) => setPasskey(e.target.value)}
+                            placeholder="Enter unlock key"
                             required
                         />
                     </div>
-                    <div>
-                        <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, marginBottom: '0.5rem' }}>Password</label>
-                        <input 
-                            type="password" 
-                            className="input-field" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <button type="submit" className="btn-primary" disabled={loading} style={{ marginTop: '0.5rem' }}>
-                        {loading ? 'Signing in...' : 'Sign In'}
-                    </button>
+                </div>
+
+                <button 
+                    type="submit" 
+                    className="login-btn"
+                    disabled={isLoading}
+                >
+                    {isLoading ? 'Unlocking...' : 'Unlock Dashboard'}
+                </button>
                 </form>
             </div>
         </div>
