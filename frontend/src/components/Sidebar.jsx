@@ -1,10 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Settings, FileDown, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, Users, Settings, FileDown } from 'lucide-react';
 
 const Sidebar = () => {
-    const { logout } = useAuth();
 
     return (
         <div className="sidebar">
@@ -32,12 +30,6 @@ const Sidebar = () => {
                 </NavLink>
             </nav>
 
-            <div style={{ padding: '1.5rem' }}>
-                <button onClick={logout} className="flex items-center gap-2" style={{ color: 'var(--text-secondary)', fontWeight: 500, width: '100%' }}>
-                    <LogOut size={20} />
-                    <span>Logout</span>
-                </button>
-            </div>
         </div>
     );
 };

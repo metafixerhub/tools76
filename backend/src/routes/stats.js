@@ -1,5 +1,5 @@
 const express = require('express');
-const { protect } = require('../middleware/auth');
+// No auth
 const Submission = require('../models/Submission');
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
 // @desc    Get dashboard statistics
 // @route   GET /api/stats
 // @access  Private
-router.get('/', protect, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const totalSubmissions = await Submission.countDocuments();
         

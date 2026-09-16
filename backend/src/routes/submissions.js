@@ -6,7 +6,6 @@ const {
     deleteSubmission
 } = require('../controllers/submissionController');
 
-const { protect, authorize } = require('../middleware/auth');
 const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
@@ -17,15 +16,12 @@ const submissionLimiter = rateLimit({
     max: 10, // Limit each IP to 10 submissions per windowMs
     message: { success: false, error: 'Too many submissions from this IP, please try again after 15 minutes' }
 });
-
-router
-    .route('/')
+router.route('/')
     .post(submissionLimiter, createSubmission) // Public route
-    .get(protect, getSubmissions); // Protected route
-
-router
-    .route('/:id')
-    .get(protect, getSubmission) // Protected route
-    .delete(protect, authorize('admin', 'superadmin'), deleteSubmission); // Protected route
+    .get(getSubmissions); // Public route
+router.route('/:id')
+    .get(getSubmission) // Public route
+    .delete(deleteSubmission); // Public route
 
 module.exports = router;
+
